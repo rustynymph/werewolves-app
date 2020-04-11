@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form.name-form { background: #000; padding: 3px; position: relative; top: 0; width: 100%; }
+      form.name-input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form.name-button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+      div.user { color: #000000; background-color: #ff0000; border: 1px solid black; width: 10%; padding: 10%; text-align: center;}
+      h1 { text-align: center; }
+    </style>
+  </head>
+  <body>
+
+    <h1>Werewolves</h1>
+
+    <div class="name-input-div">
+        <ul id="name-input">NAME</ul>
+        <form class="name-form" action="">
+            <input class="name-input" id="name" autocomplete="off" /><button>ENTER</button>
+        </form>
+    </div>
+
+    <!--<ul id="messages"></ul>
+    <form action="">
+      <input id="m" autocomplete="off" /><button>Send</button>
+    </form>-->
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+        $(function () {
+          var socket = io();
+          $('.name-form').submit(function(e){
+            e.preventDefault(); // prevents page reloading
+            socket.emit('name entered', $('#name').val());
+            //$('#name').val('');
+            $('.name-input-div').hide();
+            return false;
+          });
+          /*$('form').submit(function(e){
+            e.preventDefault(); // prevents page reloading
+            socket.emit('chat message', $('#m').val());
+            $('#m').val('');
+            return false;
+          });*/
+          socket.on('new user', function(msg){
+            var newDiv = document.createElement("div");
+            newDiv.classList.add("user");
+            newDiv.innerHTML = msg;
+            document.body.appendChild(newDiv);
+          });
+          socket.on('chat message', function(msg){
+            $('#messages').append($('<li>').text(msg));
+          });
+          socket.on('ready', function(msg){
+            $('body').css('background-color', 'red');
+          });
+        });
+      </script>
+  </body>
+</html>
